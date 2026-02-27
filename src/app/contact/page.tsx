@@ -1,14 +1,9 @@
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Contact SnehAmverseAI | Partner With Us",
-  description:
-    "Contact SnehAmverseAI for AI workshops, institutional partnerships, corporate training, and GenAI literacy programs.",
-};
-
 "use client";
 
 import { useState } from "react";
+
+
+
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
