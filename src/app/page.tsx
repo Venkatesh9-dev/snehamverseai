@@ -1,9 +1,9 @@
 export default function Home() {
   return (
-    <main className="bg-zinc-950 text-zinc-50 min-h-screen selection:bg-cyan-500/30">
+    <main className="bg-zinc-950 text-zinc-50 min-h-screen selection:bg-cyan-500/30 relative z-0">
       
       {/* ================= HERO (3D Visual Background) ================= */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden z-0">
         
         {/* 3D Video Background */}
         <video 
@@ -11,13 +11,13 @@ export default function Home() {
           loop 
           muted 
           playsInline 
-          className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-screen pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover opacity-40 mix-blend-screen pointer-events-none z-0"
         >
           <source src="/hero-bg.mp4" type="video/mp4" />
         </video>
 
-        {/* Gradient Overlay to ensure text remains perfectly readable */}
-        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/30 via-zinc-950/60 to-zinc-950 pointer-events-none" />
+        {/* Gradient Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-zinc-950/30 via-zinc-950/60 to-zinc-950 pointer-events-none z-0" />
 
         <div className="relative max-w-5xl mx-auto px-6 py-32 text-center space-y-8 z-10">
           <h1 className="text-6xl md:text-7xl lg:text-8xl font-semibold tracking-tight leading-[1.05]">
@@ -52,11 +52,9 @@ export default function Home() {
 
       {/* ================= STATEMENT BLOCK ================= */}
       <section className="py-32 relative flex justify-center px-6">
-        {/* Ambient background glow */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none z-0" />
         
-        <div className="relative max-w-4xl w-full mx-auto p-12 md:p-16 rounded-3xl bg-zinc-900/40 border border-white/5 backdrop-blur-md shadow-2xl overflow-hidden">
-          {/* Subtle top border glow */}
+        <div className="relative max-w-4xl w-full mx-auto p-12 md:p-16 rounded-3xl bg-zinc-900/40 border border-white/5 backdrop-blur-md shadow-2xl overflow-hidden z-10">
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 h-[2px] bg-gradient-to-r from-transparent via-cyan-500/50 to-transparent" />
           
           <div className="text-center space-y-8 relative z-10">
@@ -88,60 +86,52 @@ export default function Home() {
 
           <div className="grid md:grid-cols-2 gap-6 relative">
             
-            {/* Ambient background glow for the whole grid */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-cyan-500/5 blur-[100px] rounded-full pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-cyan-500/5 blur-[100px] rounded-full pointer-events-none z-0" />
 
-            {/* Card 1 */}
-            <div className="group relative p-10 rounded-2xl bg-zinc-900/50 border border-white/10 backdrop-blur-md hover:bg-zinc-900 hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] hover:-translate-y-1 transition-all duration-300 space-y-4 z-10">
-              <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-cyan-400 font-semibold">01</span>
+            {/* Cards */}
+            {[
+              {
+                id: "01",
+                title: "Foundations of Artificial Intelligence",
+                desc: "Understanding AI systems, real capabilities, and limitations beyond hype.",
+                color: "cyan",
+              },
+              {
+                id: "02",
+                title: "Responsible AI & Ethical Usage",
+                desc: "Academic integrity, decision awareness, and responsible prompting methodologies.",
+                color: "blue",
+              },
+              {
+                id: "03",
+                title: "AI for Academics",
+                desc: "Research assistance, structured revision systems, and workflow optimization.",
+                color: "cyan",
+              },
+              {
+                id: "04",
+                title: "AI for Entrepreneurs & Professionals",
+                desc: "Business productivity, automation, and strategic AI integration.",
+                color: "blue",
+              },
+            ].map((card) => (
+              <div
+                key={card.id}
+                className="group relative p-10 rounded-2xl bg-zinc-900/50 border border-white/10 backdrop-blur-md hover:bg-zinc-900 hover:-translate-y-1 transition-all duration-300 space-y-4 z-10"
+              >
+                <div className={`w-10 h-10 rounded-full bg-${card.color}-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  <span className={`text-${card.color}-400 font-semibold`}>
+                    {card.id}
+                  </span>
+                </div>
+                <h3 className="text-2xl font-medium text-zinc-100">
+                  {card.title}
+                </h3>
+                <p className="text-zinc-400 leading-relaxed">
+                  {card.desc}
+                </p>
               </div>
-              <h3 className="text-2xl font-medium text-zinc-100 group-hover:text-cyan-50 transition-colors">
-                Foundations of Artificial Intelligence
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Understanding AI systems, real capabilities, and limitations beyond hype.
-              </p>
-            </div>
-
-            {/* Card 2 */}
-            <div className="group relative p-10 rounded-2xl bg-zinc-900/50 border border-white/10 backdrop-blur-md hover:bg-zinc-900 hover:border-blue-500/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1 transition-all duration-300 space-y-4 z-10">
-              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-blue-400 font-semibold">02</span>
-              </div>
-              <h3 className="text-2xl font-medium text-zinc-100 group-hover:text-blue-50 transition-colors">
-                Responsible AI & Ethical Usage
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Academic integrity, decision awareness, and responsible prompting methodologies.
-              </p>
-            </div>
-
-            {/* Card 3 */}
-            <div className="group relative p-10 rounded-2xl bg-zinc-900/50 border border-white/10 backdrop-blur-md hover:bg-zinc-900 hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(6,182,212,0.15)] hover:-translate-y-1 transition-all duration-300 space-y-4 z-10">
-              <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-cyan-400 font-semibold">03</span>
-              </div>
-              <h3 className="text-2xl font-medium text-zinc-100 group-hover:text-cyan-50 transition-colors">
-                AI for Academics
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Research assistance, structured revision systems, and workflow optimization.
-              </p>
-            </div>
-
-            {/* Card 4 */}
-            <div className="group relative p-10 rounded-2xl bg-zinc-900/50 border border-white/10 backdrop-blur-md hover:bg-zinc-900 hover:border-blue-500/50 hover:shadow-[0_0_30px_rgba(59,130,246,0.15)] hover:-translate-y-1 transition-all duration-300 space-y-4 z-10">
-              <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300">
-                <span className="text-blue-400 font-semibold">04</span>
-              </div>
-              <h3 className="text-2xl font-medium text-zinc-100 group-hover:text-blue-50 transition-colors">
-                AI for Entrepreneurs & Professionals
-              </h3>
-              <p className="text-zinc-400 leading-relaxed">
-                Business productivity, automation, and strategic AI integration.
-              </p>
-            </div>
+            ))}
             
           </div>
           
@@ -158,11 +148,9 @@ export default function Home() {
       <section className="py-32 px-6 relative overflow-hidden">
         <div className="max-w-5xl mx-auto relative">
           
-          {/* Glowing background behind the CTA box */}
-          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-[100px] rounded-full pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 blur-[100px] rounded-full pointer-events-none z-0" />
           
-          <div className="relative p-12 md:p-20 rounded-3xl bg-zinc-900/80 border border-white/10 backdrop-blur-xl text-center space-y-10 shadow-2xl">
-            {/* Subtle top border glow for consistency */}
+          <div className="relative p-12 md:p-20 rounded-3xl bg-zinc-900/80 border border-white/10 backdrop-blur-xl text-center space-y-10 shadow-2xl z-10">
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1/2 h-[2px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent" />
 
             <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-zinc-100">

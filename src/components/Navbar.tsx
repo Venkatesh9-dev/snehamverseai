@@ -9,19 +9,22 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <header className="w-full fixed top-0 left-0 z-50">
+    <header className="w-full fixed top-0 left-0 z-[9999] isolate">
       <div className="w-full border-b border-white/5 bg-zinc-950/80 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           
-          {/* LOGO: SnehAmverse (Text-based professional mark) */}
+          {/* LOGO */}
           <Link href="/" className="flex items-center group">
             <span className="text-2xl font-bold tracking-tighter text-white group-hover:text-cyan-400 transition-colors">
-              SnehAm<span className="text-zinc-500 group-hover:text-white transition-colors">verse</span>
+              SnehAm
+              <span className="text-zinc-500 group-hover:text-white transition-colors">
+                verse
+              </span>
               <span className="text-cyan-500 ml-0.5">AI</span>
             </span>
           </Link>
 
-          {/* DESKTOP NAV (Mac/Laptop) */}
+          {/* DESKTOP NAV */}
           <nav className="hidden lg:flex items-center gap-2">
             {[
               { name: "Programs", href: "/programs" },
@@ -35,11 +38,19 @@ export default function Navbar() {
                   key={link.name}
                   href={link.href}
                   className={`relative px-5 py-2 text-sm font-medium transition-all duration-300 rounded-full group ${
-                    isActive ? "text-white" : "text-zinc-400 hover:text-zinc-100"
+                    isActive
+                      ? "text-white"
+                      : "text-zinc-400 hover:text-zinc-100"
                   }`}
                 >
                   <span className="relative z-10">{link.name}</span>
-                  <div className={`absolute inset-0 bg-white/5 rounded-full transition-all duration-300 ${isActive ? "opacity-100 scale-100" : "opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100"}`} />
+                  <div
+                    className={`absolute inset-0 bg-white/5 rounded-full transition-all duration-300 ${
+                      isActive
+                        ? "opacity-100 scale-100"
+                        : "opacity-0 scale-90 group-hover:opacity-100 group-hover:scale-100"
+                    }`}
+                  />
                   {isActive && (
                     <div className="absolute -bottom-[26px] left-0 w-full h-[2px] bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.5)]" />
                   )}
@@ -48,7 +59,7 @@ export default function Navbar() {
             })}
           </nav>
 
-          {/* RIGHT SIDE: CTA & MOBILE TOGGLE */}
+          {/* RIGHT SIDE */}
           <div className="flex items-center gap-4">
             <Link
               href="/contact"
@@ -57,23 +68,39 @@ export default function Navbar() {
               Book Workshop
             </Link>
 
-            {/* Mobile/Tablet Menu Button */}
-            <button 
+            {/* Mobile Toggle */}
+            <button
               onClick={() => setIsOpen(!isOpen)}
               className="lg:hidden p-2 text-zinc-400 hover:text-white transition-colors"
             >
               <div className="w-6 h-5 relative flex flex-col justify-between">
-                <span className={`w-full h-0.5 bg-current transition-all ${isOpen ? 'rotate-45 translate-y-2' : ''}`} />
-                <span className={`w-full h-0.5 bg-current transition-all ${isOpen ? 'opacity-0' : ''}`} />
-                <span className={`w-full h-0.5 bg-current transition-all ${isOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+                <span
+                  className={`w-full h-0.5 bg-current transition-all ${
+                    isOpen ? "rotate-45 translate-y-2" : ""
+                  }`}
+                />
+                <span
+                  className={`w-full h-0.5 bg-current transition-all ${
+                    isOpen ? "opacity-0" : ""
+                  }`}
+                />
+                <span
+                  className={`w-full h-0.5 bg-current transition-all ${
+                    isOpen ? "-rotate-45 -translate-y-2" : ""
+                  }`}
+                />
               </div>
             </button>
           </div>
         </div>
       </div>
 
-      {/* MOBILE MENU OVERLAY (iOS/Android/Tablet) */}
-      <div className={`lg:hidden fixed inset-0 top-20 bg-zinc-950/95 backdrop-blur-2xl transition-transform duration-500 ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      {/* MOBILE MENU */}
+      <div
+        className={`lg:hidden fixed inset-0 top-20 bg-zinc-950/95 backdrop-blur-2xl transition-transform duration-500 ${
+          isOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
         <nav className="flex flex-col p-8 gap-6">
           {[
             { name: "Programs", href: "/programs" },
