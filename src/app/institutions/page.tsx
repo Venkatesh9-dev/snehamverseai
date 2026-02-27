@@ -1,3 +1,10 @@
+import type { Metadata } from "next";
+export const metadata: Metadata = {
+  title: "Institutional AI Partnerships & Collaboration Model",
+  description:
+    "Strategic AI literacy partnerships for engineering colleges, government institutions, and corporate training departments.",
+};
+
 export default function InstitutionsPage() {
   return (
     <main className="bg-zinc-950 text-zinc-50 min-h-screen selection:bg-cyan-500/30 font-sans pb-24">

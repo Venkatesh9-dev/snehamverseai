@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Book AI Workshops & Institutional Training Programs",
+  description:
+    "Book AI literacy workshops, GenAI training sessions, and automation programs for colleges, government bodies, and corporate institutions.",
+};
+
 export default function WorkshopsPage() {
   return (
     <main className="bg-zinc-950 text-zinc-50 min-h-screen selection:bg-cyan-500/30 font-sans pb-24">

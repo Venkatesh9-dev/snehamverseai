@@ -1,3 +1,11 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "AI Programs & GenAI Curriculum for Institutions",
+  description:
+    "Explore structured AI literacy programs, GenAI modules, and automation workshops designed for colleges, professionals, and organizations across India.",
+};
+
 export default function ProgramsPage() {
   return (
     <main className="bg-zinc-950 text-zinc-50 min-h-screen selection:bg-cyan-500/30 font-sans pb-32">

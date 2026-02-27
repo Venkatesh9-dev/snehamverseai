@@ -6,40 +6,36 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://snehamverseai.com"),
 
   title: {
-    default: "SnehAmverseAI | AI Literacy & Institutional GenAI Workshops",
+    default: "SnehAmverseAI | AI Literacy & GenAI Institutional Workshops in India",
     template: "%s | SnehAmverseAI",
   },
 
   description:
-    "SnehAmverseAI delivers AI literacy programs, GenAI workshops, and institutional AI training across India. An initiative under SNEHAMVERSE PRIVATE LIMITED.",
-
-  keywords: [
-    "AI Workshop India",
-    "GenAI Training",
-    "AI Literacy Program",
-    "Artificial Intelligence Education",
-    "Institution AI Training India",
-    "Responsible AI Education",
-    "SnehAmverseAI",
-  ],
-
-  creator: "SnehAmverseAI",
-  publisher: "SNEHAMVERSE PRIVATE LIMITED",
+    "SnehAmverseAI provides AI literacy programs, GenAI workshops, automation training, and institutional AI education across India.",
 
   openGraph: {
     title: "SnehAmverseAI | AI Literacy & Institutional GenAI Workshops",
     description:
-      "Empowering institutions and students with responsible AI literacy and GenAI skills.",
+      "Structured AI literacy programs and GenAI workshops for institutions across India.",
     url: "https://snehamverseai.com",
     siteName: "SnehAmverseAI",
     type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "SnehAmverseAI - AI Literacy & Workshops",
+      },
+    ],
   },
 
   twitter: {
     card: "summary_large_image",
-    title: "SnehAmverseAI | AI Literacy & Institutional Workshops",
+    title: "SnehAmverseAI | AI Literacy & GenAI Workshops",
     description:
-      "AI literacy programs and GenAI training for institutions across India.",
+      "AI literacy programs and institutional GenAI training across India.",
+    images: ["/og-image.png"],
   },
 
   robots: {
