@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { createClient } from "@supabase/supabase-js";
 
 const supabase = createClient(
@@ -8,13 +9,20 @@ const supabase = createClient(
 
 export async function GET() {
   try {
+    /* ── Auth ── */
+    const { userId } = await auth();
+
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    /* ── Only return conversations owned by this user ── */
     const { data, error } = await supabase
       .from("conversations")
       .select("*")
-      .eq("user_id", "guest") // later replace with auth user id
+      .eq("user_id", userId)          // ✅ real user — never "guest"
       .eq("is_deleted", false)
       .order("created_at", { ascending: false });
-      
 
     if (error) throw error;
 

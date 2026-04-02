@@ -237,7 +237,31 @@ export async function POST(req: Request) {
     };
 
     /* ----------------------------------------------------------
-       5. SAVE USER MESSAGE
+       5a. ✅ OWNERSHIP CHECK (NEW — CRITICAL FOR USER PRIVACY)
+       Verify the conversation belongs to this user before
+       processing anything. Prevents:
+       - Cross-user data leaks
+       - Spoofed conversation_id attacks
+       - One user injecting messages into another user's chat
+    ---------------------------------------------------------- */
+    const { data: convOwnership, error: ownershipError } =
+      await supabaseAdmin
+        .from("conversations")
+        .select("id")
+        .eq("id", conversation_id)
+        .eq("user_id", userId)         // must belong to requesting user
+        .eq("is_deleted", false)
+        .single();
+
+    if (ownershipError || !convOwnership) {
+      return new Response(
+        JSON.stringify({ error: "Forbidden. Conversation not found." }),
+        { status: 403, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    /* ----------------------------------------------------------
+       5b. SAVE USER MESSAGE
     ---------------------------------------------------------- */
     await supabaseAdmin.from("ai_messages").insert([
       {
@@ -308,7 +332,10 @@ export async function POST(req: Request) {
 
       if (matches && matches.length > 0) {
         context = matches
-          .map((doc: { content: string }, i: number) => `Source ${i + 1}:\n${doc.content}`)
+          .map(
+            (doc: { content: string }, i: number) =>
+              `Source ${i + 1}:\n${doc.content}`
+          )
           .join("\n\n");
       }
     } catch (err) {
@@ -368,8 +395,12 @@ export async function POST(req: Request) {
             {
               role: "system" as const,
               content: [
-                context ? `Knowledge Context (from "An Uninvited Guest" and platform knowledge):\n${context}` : "",
-                webContext ? `Web Results (use only if relevant to the user's query):\n${webContext}` : "",
+                context
+                  ? `Knowledge Context (from "An Uninvited Guest" and platform knowledge):\n${context}`
+                  : "",
+                webContext
+                  ? `Web Results (use only if relevant to the user's query):\n${webContext}`
+                  : "",
               ]
                 .filter(Boolean)
                 .join("\n\n"),
@@ -448,7 +479,7 @@ export async function POST(req: Request) {
             }
           }
         } finally {
-          // Always save the AI message and resolve title, even on stream abort.
+          // Always save AI message and resolve title, even on stream abort.
           await Promise.allSettled([
             supabaseAdmin.from("ai_messages").insert([
               {
@@ -474,8 +505,7 @@ export async function POST(req: Request) {
         ? Buffer.from(JSON.stringify(structuredSources)).toString("base64")
         : "";
 
-    // Suppress unused variable warning — ip is kept for potential
-    // future abuse logging without affecting the response.
+    // ip kept for future abuse logging — suppress unused warning.
     void ip;
 
     return new Response(stream, {
