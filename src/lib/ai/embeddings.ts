@@ -1,15 +1,21 @@
-import OpenAI from "openai";
-
-const client = new OpenAI({
-  apiKey: process.env.OPENROUTER_API_KEY!,
-  baseURL: "https://openrouter.ai/api/v1",
-});
-
 export async function generateEmbedding(text: string): Promise<number[]> {
-  const response = await client.embeddings.create({
-    model: "openai/text-embedding-3-small",
-    input: text,
+  const response = await fetch("https://openrouter.ai/api/v1/embeddings", {
+    method: "POST",
+    headers: {
+      Authorization: "Bearer " + process.env.OPENROUTER_API_KEY!,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "openai/text-embedding-3-small",
+      input: text,
+    }),
   });
 
-  return response.data[0].embedding;
-}
+  if (!response.ok) {
+    const err = await response.text();
+    throw new Error(`Embedding request failed: ${err}`);
+  }
+
+  const data = await response.json();
+  return data.data[0].embedding;
+} 
