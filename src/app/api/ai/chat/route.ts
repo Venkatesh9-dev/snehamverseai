@@ -118,37 +118,30 @@ async function generateAndSaveTitle(
 
     if (!isUntitled(conv?.title)) return;
 
-    const titleRes = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: "Bearer " + process.env.OPENROUTER_API_KEY,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "deepseek/deepseek-chat",
-          temperature: 0.3,
-          max_tokens: 20,
-          stream: false,
-          messages: [
-            {
-              role: "system",
-              content:
-                "You generate ultra-short chat titles. Reply with ONLY 3–5 words. No quotes. No punctuation. No explanation.",
-            },
-            {
-              role: "user",
-              content: `Generate a 3–5 word title for this message:\n\n"${message}"`,
-            },
-          ],
-        }),
-      }
-    );
+    const titleRes = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": process.env.ANTHROPIC_API_KEY!,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 20,
+        system:
+          "You generate ultra-short chat titles. Reply with ONLY 3–5 words. No quotes. No punctuation. No explanation.",
+        messages: [
+          {
+            role: "user",
+            content: `Generate a 3–5 word title for this message:\n\n"${message}"`,
+          },
+        ],
+      }),
+    });
 
     const titleData = await titleRes.json();
     const rawTitle: string =
-      titleData?.choices?.[0]?.message?.content?.trim() ?? "";
+      titleData?.content?.[0]?.text?.trim() ?? "";
 
     const generatedTitle =
       rawTitle.length > 0
@@ -237,19 +230,16 @@ export async function POST(req: Request) {
     };
 
     /* ----------------------------------------------------------
-       5a. ✅ OWNERSHIP CHECK (NEW — CRITICAL FOR USER PRIVACY)
+       5a. OWNERSHIP CHECK
        Verify the conversation belongs to this user before
-       processing anything. Prevents:
-       - Cross-user data leaks
-       - Spoofed conversation_id attacks
-       - One user injecting messages into another user's chat
+       processing anything.
     ---------------------------------------------------------- */
     const { data: convOwnership, error: ownershipError } =
       await supabaseAdmin
         .from("conversations")
         .select("id")
         .eq("id", conversation_id)
-        .eq("user_id", userId)         // must belong to requesting user
+        .eq("user_id", userId)
         .eq("is_deleted", false)
         .single();
 
@@ -313,7 +303,7 @@ export async function POST(req: Request) {
 
     const historyMessages =
       history?.map((msg: { role: string; message: string }) => ({
-        role: msg.role,
+        role: msg.role as "user" | "assistant",
         content: msg.message,
       })) ?? [];
 
@@ -378,59 +368,48 @@ export async function POST(req: Request) {
     }
 
     /* ----------------------------------------------------------
-       11. OPENROUTER STREAMING REQUEST
+       11. ANTHROPIC STREAMING REQUEST
+       Anthropic uses a top-level "system" string (not a role
+       in the messages array). All context is merged there.
     ---------------------------------------------------------- */
-    const systemMessages = [
-      {
-        role: "system" as const,
-        content: SYSTEM_PROMPT,
-      },
-      // Only inject memory if we have something meaningful
-      ...(memoryContext
-        ? [{ role: "system" as const, content: memoryContext }]
-        : []),
-      // Only inject context block if RAG or web results exist
-      ...(context || webContext
-        ? [
-            {
-              role: "system" as const,
-              content: [
-                context
-                  ? `Knowledge Context (from "An Uninvited Guest" and platform knowledge):\n${context}`
-                  : "",
-                webContext
-                  ? `Web Results (use only if relevant to the user's query):\n${webContext}`
-                  : "",
-              ]
-                .filter(Boolean)
-                .join("\n\n"),
-            },
-          ]
-        : []),
+    const systemContent = [
+      SYSTEM_PROMPT,
+      memoryContext || "",
+      context
+        ? `Knowledge Context (from "An Uninvited Guest" and platform knowledge):\n${context}`
+        : "",
+      webContext
+        ? `Web Results (use only if relevant to the user's query):\n${webContext}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n\n");
+
+    // Anthropic messages array must only contain user/assistant roles
+    const anthropicMessages = [
+      ...historyMessages,
+      { role: "user" as const, content: message },
     ];
 
-    const aiRes = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const aiRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: "Bearer " + process.env.OPENROUTER_API_KEY,
+        "x-api-key": process.env.ANTHROPIC_API_KEY!,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "deepseek/deepseek-chat",
-        temperature: 0.5,
+        model: "claude-haiku-4-5-20251001",
         max_tokens: plan === "pro" ? 2000 : 1200,
         stream: true,
-        messages: [
-          ...systemMessages,
-          ...historyMessages,
-          { role: "user", content: message },
-        ],
+        system: systemContent,
+        messages: anthropicMessages,
       }),
     });
 
     if (!aiRes.ok) {
       const errText = await aiRes.text();
-      console.error("[OpenRouter] Non-OK response:", errText);
+      console.error("[Anthropic] Non-OK response:", errText);
       return NextResponse.json(
         { error: "AI service temporarily unavailable." },
         { status: 502 }
@@ -439,6 +418,9 @@ export async function POST(req: Request) {
 
     /* ----------------------------------------------------------
        12. STREAM HANDLING
+       Anthropic SSE format differs from OpenRouter:
+       - Event type: "content_block_delta"
+       - Token path: delta.text  (not choices[0].delta.content)
     ---------------------------------------------------------- */
     const encoder = new TextEncoder();
 
@@ -468,10 +450,13 @@ export async function POST(req: Request) {
 
               try {
                 const parsed = JSON.parse(jsonStr);
-                const token = parsed?.choices?.[0]?.delta?.content ?? "";
-                if (token) {
-                  fullResponse += token;
-                  controller.enqueue(encoder.encode(token));
+                // Anthropic streams content_block_delta events
+                if (parsed?.type === "content_block_delta") {
+                  const token = parsed?.delta?.text ?? "";
+                  if (token) {
+                    fullResponse += token;
+                    controller.enqueue(encoder.encode(token));
+                  }
                 }
               } catch {
                 // Malformed SSE chunk — skip silently.
