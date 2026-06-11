@@ -29,9 +29,14 @@ export const metadata: Metadata = {
     "AI upskilling",
   ],
 
-  authors: [{ name: "SnehAmverseAI", url: "https://snehamverseai.com" }],
-  creator: "SnehAmverseAI",
-  publisher: "SnehAmverseAI",
+  authors: [
+    {
+      name: "SNEHAMVERSE PRIVATE LIMITED",
+      url: "https://snehamverseai.com",
+    },
+  ],
+  creator: "SNEHAMVERSE PRIVATE LIMITED",
+  publisher: "SNEHAMVERSE PRIVATE LIMITED",
 
   /* ── OpenGraph ── */
   openGraph: {
@@ -124,7 +129,7 @@ export default function RootLayout({
                 },
                 author: {
                   "@type": "Organization",
-                  name: "SnehAmverseAI",
+                  name: "SNEHAMVERSE PRIVATE LIMITED",
                   url: "https://snehamverseai.com",
                 },
                 featureList: [
@@ -146,10 +151,13 @@ export default function RootLayout({
               __html: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "Organization",
-                name: "SnehAmverseAI",
+                name: "SNEHAMVERSE PRIVATE LIMITED",
+                alternateName: "SnehAmverseAI",
                 url: "https://snehamverseai.com",
                 logo: "https://snehamverseai.com/logo.png",
-                sameAs: [],
+                sameAs: [
+                  "https://snehamverseai.com"
+                ],
                 contactPoint: {
                   "@type": "ContactPoint",
                   contactType: "customer service",
